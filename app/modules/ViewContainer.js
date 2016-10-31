@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import TeamView from './teams/TeamView';
+import LoginView from './login/LoginView';
 
 export default class ViewContainer extends Component {
   constructor () {
@@ -10,6 +11,7 @@ export default class ViewContainer extends Component {
   render () {
 //    if (this.state.token !== '') {
       return (
+        //<LoginView />
         <TeamView />
       )
 //    }
