@@ -98,43 +98,6 @@ class TeamView extends Component {
 
   }
 
-  _changeStyle(button) {
-
-    if (button==1) {
-      this.setState({ backgroundColor1: "rgba(185, 45, 220, 0.3)"  });
-      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
-    } else if (button==2) {
-      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor2: "rgba(185, 45, 220, 0.3)"  });
-      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
-    } else if (button==3) {
-      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor3: "rgba(185, 45, 220, 0.3)"  });
-      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
-    } else if (button==4) {
-      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor4: "rgba(185, 45, 220, 0.3)"  });
-      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
-    } else if (button==5) {
-      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
-      this.setState({ backgroundColor5: "rgba(185, 45, 220, 0.3)"  });
-    }
-
-
-  }
-
   renderTeamRow (team) {
     const imgSource = THUMBS;
     return (
@@ -147,9 +110,8 @@ class TeamView extends Component {
             <View style={styles.allButtons}>
               <View>
                 <TouchableHighlight
-                onPress={this._givePoints.bind(this, 1, team.teamId),this._changeStyle.bind(this, 1)}
-                style={{ backgroundColor: this.state.backgroundColor1, borderRadius: 25}}
-                id={team.teamId}>
+                onPress={this._givePoints.bind(this, 1, team.teamId)}
+                style={{ backgroundColor: this.state.backgroundColor1, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro1.png')}
@@ -158,7 +120,7 @@ class TeamView extends Component {
               </View>
               <View>
                 <TouchableHighlight
-                onPress={this._givePoints.bind(this, 2, team.teamId),this._changeStyle.bind(this, 2)}
+                onPress={this._givePoints.bind(this, 2, team.teamId)}
                 style={{ backgroundColor: this.state.backgroundColor2, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
@@ -168,7 +130,7 @@ class TeamView extends Component {
               </View>
               <View>
                 <TouchableHighlight
-                onPress={this._givePoints.bind(this, 3, team.teamId),this._changeStyle.bind(this, 3)}
+                onPress={this._givePoints.bind(this, 3, team.teamId)}
                 style={{ backgroundColor: this.state.backgroundColor3, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
@@ -178,7 +140,7 @@ class TeamView extends Component {
               </View>
               <View>
                 <TouchableHighlight
-                onPress={this._givePoints.bind(this, 4, team.teamId),this._changeStyle.bind(this, 4)}
+                onPress={this._givePoints.bind(this, 4, team.teamId)}
                 style={{ backgroundColor: this.state.backgroundColor4, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
@@ -188,7 +150,7 @@ class TeamView extends Component {
               </View>
               <View>
                 <TouchableHighlight
-                onPress={this._givePoints.bind(this, 5, team.teamId),this._changeStyle.bind(this, 5)}
+                onPress={this._givePoints.bind(this, 5, team.teamId)}
                 style={{ backgroundColor: this.state.backgroundColor5, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
