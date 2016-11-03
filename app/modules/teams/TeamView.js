@@ -5,35 +5,57 @@ import {
   StyleSheet,
   Image,
   TouchableHighlight,
+  TouchableOpacity,
   ListView,
-  TextInput
+  TextInput,
+  AsyncStorage
 } from 'react-native';
 import THUMBS from '../../../docs/images/defaultImage_tn.jpg';
 //import teams from '../../../docs/teams.json';
-const teams = [
-  {img: "image1", name: "team1"},
-  {img: "image2", name: "team2"},
-  {img: "image3", name: "team3"},
-  {img: "image4", name: "team4"},
-  {img: "image5", name: "team5"},
-  {img: "image1", name: "team1"},
-  {img: "image2", name: "team2"},
-  {img: "image3", name: "team3"},
-  {img: "image4", name: "team4"},
-  {img: "image5", name: "team5"},
-  {img: "image1", name: "team1"},
-  {img: "image2", name: "team2"},
-  {img: "image3", name: "team3"},
-  {img: "image4", name: "team4"},
-  {img: "image5", name: "team5"},
-]
+const teams = []
+const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+var teampoints = 0
+var teamId = 0
+var button = 0
+
 class TeamView extends Component {
+
   constructor() {
     super();
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
       teamDataSource: ds.cloneWithRows(teams),
+      backgroundColor1: "rgba(0,0,0,0)",
+      backgroundColor2: "rgba(0,0,0,0)",
+      backgroundColor3: "rgba(0,0,0,0)",
+      backgroundColor4: "rgba(0,0,0,0)",
+      backgroundColor5: "rgba(0,0,0,0)",
     };
+    try {
+      fetch('http://localhost:3000/teamList', {
+            method: 'POST',
+            body: JSON.stringify({
+              searchfilter: "",
+            })
+          })
+        .then((response) => response.json())
+        .then(response => {
+          var allTeamsList = response.result
+          for (var i = 0; i < allTeamsList.length; i++) {
+            teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId});
+            this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+
+          }
+          //console.log(teams);
+        })
+      } catch (error) {
+        Alert.alert(
+            'Yhteys kantaan ei ole päällä',
+            ':C',
+            [
+              {text: 'OK', onPress: () => console.log('OK Pressed')},
+            ]
+          )
+      }
   }
 
   render () {
@@ -45,11 +67,72 @@ class TeamView extends Component {
           </Text>
         </View>
       <ListView
+        enableEmptySections={true}
         dataSource={this.state.teamDataSource}
         renderRow={(team) => { return this.renderTeamRow(team)}}
       />
       </View>
     );
+  }
+
+  _givePoints(teampoints, teamId){
+    try {
+      fetch('http://localhost:3000/companypoint', {
+            method: 'POST',
+            body: JSON.stringify({
+              teamId: teamId,
+              companyId: 1,
+              point: teampoints
+            })
+          })
+        .then((response) => response.json())
+        .then(response => {
+          var report = response.success
+          console.log(report)
+
+          //console.log(teams);
+        })
+      } catch (error) {
+        console.log(error);
+      }
+
+  }
+
+  _changeStyle(button) {
+
+    if (button==1) {
+      this.setState({ backgroundColor1: "rgba(185, 45, 220, 0.3)"  });
+      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
+    } else if (button==2) {
+      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor2: "rgba(185, 45, 220, 0.3)"  });
+      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
+    } else if (button==3) {
+      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor3: "rgba(185, 45, 220, 0.3)"  });
+      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
+    } else if (button==4) {
+      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor4: "rgba(185, 45, 220, 0.3)"  });
+      this.setState({ backgroundColor5: "rgba(0,0,0,0)"  });
+    } else if (button==5) {
+      this.setState({ backgroundColor1: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor2: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor3: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor4: "rgba(0,0,0,0)"  });
+      this.setState({ backgroundColor5: "rgba(185, 45, 220, 0.3)"  });
+    }
+
+
   }
 
   renderTeamRow (team) {
@@ -63,7 +146,10 @@ class TeamView extends Component {
             </View>
             <View style={styles.allButtons}>
               <View>
-                <TouchableHighlight>
+                <TouchableHighlight
+                onPress={this._givePoints.bind(this, 1, team.teamId),this._changeStyle.bind(this, 1)}
+                style={{ backgroundColor: this.state.backgroundColor1, borderRadius: 25}}
+                id={team.teamId}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro1.png')}
@@ -71,7 +157,9 @@ class TeamView extends Component {
                 </TouchableHighlight>
               </View>
               <View>
-                <TouchableHighlight>
+                <TouchableHighlight
+                onPress={this._givePoints.bind(this, 2, team.teamId),this._changeStyle.bind(this, 2)}
+                style={{ backgroundColor: this.state.backgroundColor2, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro2.png')}
@@ -79,7 +167,9 @@ class TeamView extends Component {
                 </TouchableHighlight>
               </View>
               <View>
-                <TouchableHighlight>
+                <TouchableHighlight
+                onPress={this._givePoints.bind(this, 3, team.teamId),this._changeStyle.bind(this, 3)}
+                style={{ backgroundColor: this.state.backgroundColor3, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro3.png')}
@@ -87,7 +177,9 @@ class TeamView extends Component {
                 </TouchableHighlight>
               </View>
               <View>
-                <TouchableHighlight>
+                <TouchableHighlight
+                onPress={this._givePoints.bind(this, 4, team.teamId),this._changeStyle.bind(this, 4)}
+                style={{ backgroundColor: this.state.backgroundColor4, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro4.png')}
@@ -95,7 +187,9 @@ class TeamView extends Component {
                 </TouchableHighlight>
               </View>
               <View>
-                <TouchableHighlight>
+                <TouchableHighlight
+                onPress={this._givePoints.bind(this, 5, team.teamId),this._changeStyle.bind(this, 5)}
+                style={{ backgroundColor: this.state.backgroundColor5, borderRadius: 25}}>
                   <Image
                     style={styles.numButton}
                     source={require('../../../docs/images/buttonImages/nro5.png')}
