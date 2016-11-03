@@ -11,6 +11,7 @@ import {
   AsyncStorage
 } from 'react-native';
 import THUMBS from '../../../docs/images/defaultImage_tn.jpg';
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 //import teams from '../../../docs/teams.json';
 const teams = []
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
@@ -18,17 +19,42 @@ var teampoints = 0
 var teamId = 0
 var button = 0
 
+var radio_props = [
+  {label: '1', value: 1 },
+  {label: '2', value: 2 },
+  {label: '3', value: 3 },
+  {label: '4', value: 4 },
+  {label: '5', value: 5 }
+];
+
+function _givePoints(teampoints, teamId){
+  try {
+    fetch('http://localhost:3000/companypoint', {
+          method: 'POST',
+          body: JSON.stringify({
+            teamId: teamId,
+            companyId: 1,
+            point: teampoints
+          })
+        })
+      .then((response) => response.json())
+      .then(response => {
+        var report = response.success
+        console.log(report)
+
+        //console.log(teams);
+      })
+    } catch (error) {
+      console.log(error);
+    }
+}
+
 class TeamView extends Component {
 
   constructor() {
     super();
     this.state = {
       teamDataSource: ds.cloneWithRows(teams),
-      backgroundColor1: "rgba(0,0,0,0)",
-      backgroundColor2: "rgba(0,0,0,0)",
-      backgroundColor3: "rgba(0,0,0,0)",
-      backgroundColor4: "rgba(0,0,0,0)",
-      backgroundColor5: "rgba(0,0,0,0)",
     };
     try {
       fetch('http://localhost:3000/teamList', {
@@ -41,7 +67,7 @@ class TeamView extends Component {
         .then(response => {
           var allTeamsList = response.result
           for (var i = 0; i < allTeamsList.length; i++) {
-            teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId});
+            teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
             this.setState({ teamDataSource: ds.cloneWithRows(teams) });
 
           }
@@ -75,29 +101,6 @@ class TeamView extends Component {
     );
   }
 
-  _givePoints(teampoints, teamId){
-    try {
-      fetch('http://localhost:3000/companypoint', {
-            method: 'POST',
-            body: JSON.stringify({
-              teamId: teamId,
-              companyId: 1,
-              point: teampoints
-            })
-          })
-        .then((response) => response.json())
-        .then(response => {
-          var report = response.success
-          console.log(report)
-
-          //console.log(teams);
-        })
-      } catch (error) {
-        console.log(error);
-      }
-
-  }
-
   renderTeamRow (team) {
     const imgSource = THUMBS;
     return (
@@ -109,54 +112,15 @@ class TeamView extends Component {
             </View>
             <View style={styles.allButtons}>
               <View>
-                <TouchableHighlight
-                onPress={this._givePoints.bind(this, 1, team.teamId)}
-                style={{ backgroundColor: this.state.backgroundColor1, borderRadius: 25}}>
-                  <Image
-                    style={styles.numButton}
-                    source={require('../../../docs/images/buttonImages/nro1.png')}
-                  />
-                </TouchableHighlight>
-              </View>
-              <View>
-                <TouchableHighlight
-                onPress={this._givePoints.bind(this, 2, team.teamId)}
-                style={{ backgroundColor: this.state.backgroundColor2, borderRadius: 25}}>
-                  <Image
-                    style={styles.numButton}
-                    source={require('../../../docs/images/buttonImages/nro2.png')}
-                  />
-                </TouchableHighlight>
-              </View>
-              <View>
-                <TouchableHighlight
-                onPress={this._givePoints.bind(this, 3, team.teamId)}
-                style={{ backgroundColor: this.state.backgroundColor3, borderRadius: 25}}>
-                  <Image
-                    style={styles.numButton}
-                    source={require('../../../docs/images/buttonImages/nro3.png')}
-                  />
-                </TouchableHighlight>
-              </View>
-              <View>
-                <TouchableHighlight
-                onPress={this._givePoints.bind(this, 4, team.teamId)}
-                style={{ backgroundColor: this.state.backgroundColor4, borderRadius: 25}}>
-                  <Image
-                    style={styles.numButton}
-                    source={require('../../../docs/images/buttonImages/nro4.png')}
-                  />
-                </TouchableHighlight>
-              </View>
-              <View>
-                <TouchableHighlight
-                onPress={this._givePoints.bind(this, 5, team.teamId)}
-                style={{ backgroundColor: this.state.backgroundColor5, borderRadius: 25}}>
-                  <Image
-                    style={styles.numButton}
-                    source={require('../../../docs/images/buttonImages/nro5.png')}
-                  />
-                </TouchableHighlight>
+
+              <RadioForm
+                radio_props={radio_props}
+                initial={team.point-1}
+                labelHorizontal={false}
+                formHorizontal={true}
+
+                onPress={(value) => { _givePoints( value, team.teamId)}}
+                />
               </View>
             </View>
           </View>
