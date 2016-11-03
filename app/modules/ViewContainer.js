@@ -11,8 +11,8 @@ export default class ViewContainer extends Component {
   render () {
 //    if (this.state.token !== '') {
       return (
-        //<LoginView />
-        <TeamView />
+        <LoginView />
+        //<TeamView />
       )
 //    }
     // return (

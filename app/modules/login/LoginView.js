@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   welcomeText: {
-    margin: 20
+    marginLeft:30,
+    marginTop: 30
   },
   textField: {
-
 
   },
   loginContent: {
@@ -75,16 +75,16 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   inputContainer: {
-    alignItems: "flex-start",
-    marginLeft: 20,
-    marginBottom: 20
+    padding: 35,
+    borderWidth: 1,
+    borderColor: 'transparent'
   },
   input: {
     width: 300,
-    height: 70,
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 20
+    height: 45,
+    fontSize: 20,
+
+
   },
   loginButton: {
     backgroundColor: '#ff5454',
@@ -100,15 +100,16 @@ const styles = StyleSheet.create({
   logoImg: {
     height: 150,
     width: 150,
-    marginTop: 50
+
   },
   textstyle: {
-    fontWeight: "bold",
     color: '#FFF',
-    fontSize: 24
+    fontSize: 20,
+
+
   },
   whiteFont: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#FFF'
   },
 });
