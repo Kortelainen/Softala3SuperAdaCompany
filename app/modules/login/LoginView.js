@@ -5,19 +5,68 @@ import {
   TextInput,
   StyleSheet,
   TouchableHighlight,
-  Image
+  Image,
+  AsyncStorage
 } from 'react-native';
+
+const ACCESS_TOKEN = 'access_token';
 
 class LoginView extends Component {
   propTypes: {
 
   }
-  // companyLogin () {
-  //   return ()
-  // }
+
   constructor () {
     super();
-    this.state = {companyname: ""};
+    this.state = {
+      companyname: "",
+      error: ""
+    }
+  }
+
+  storeToken(responseData) {
+    AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err) => {
+      if(err) {
+        console.log("it's an error");
+        throw err;
+      }
+      console.log("it's a success");
+    }).catch((err) => {
+      console.log("error is " + error)
+    });
+  }
+
+  async companyLogin () {
+    try {
+      let response = await fetch('https://localhost/company/authenticate', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyname: this.state.companyname
+        })
+      });
+      let res = await response.text();
+      if (response.status >= 200 && response.status < 300) {
+        let accessToken = res;
+        console.log(accessToken);
+        this.storeToken(accessToken);
+        this.redirect('TeamView');
+      } else {
+        let error = res;
+        throw error;
+      }
+    } catch(error) {
+      this.setState({error: error});
+      console.log("error " + error);
+    }
+  }
+  redirect () {
+    this.props.navigator.push({
+      id: 'TeamView'
+    });
   }
 
   render () {
@@ -42,7 +91,7 @@ class LoginView extends Component {
               </View>
         </View>
         <View style={styles.loginButton}>
-          <TouchableHighlight onPress={this.companyLogin}>
+          <TouchableHighlight onPress={this.companyLogin.bind(this)}>
             <View style={styles.login}>
               <Text style={styles.whiteFont}>KIRJAUDU SISÄÄN</Text>
             </View>
@@ -68,7 +117,8 @@ const styles = StyleSheet.create({
     marginTop: 30
   },
   textField: {
-
+    borderColor: 'gray',
+    borderWidth: 1
   },
   loginContent: {
     justifyContent: "flex-start",
