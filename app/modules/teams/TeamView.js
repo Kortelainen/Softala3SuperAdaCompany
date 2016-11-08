@@ -8,16 +8,18 @@ import {
   TouchableOpacity,
   ListView,
   TextInput,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from 'react-native';
-import THUMBS from '../../../docs/images/defaultImage_tn.jpg';
+import THUMBS from '../../../docs/images/defImg.jpeg';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
-//import teams from '../../../docs/teams.json';
+
 const teams = []
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 var teampoints = 0
 var teamId = 0
 var button = 0
+var name = ''
 
 var radio_props = [
   {label: '1', value: 1 },
@@ -27,7 +29,17 @@ var radio_props = [
   {label: '5', value: 5 }
 ];
 
-function _givePoints(teampoints, teamId){
+function _givePoints(teampoints, teamId, name){
+  Alert.alert(
+    'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
+    'Vahvista pisteet painamalla OK'
+    [
+      {text: 'OK', onPress: savePoints(teampoints,teamId)}
+    ]
+  )
+}
+
+function savePoints(teampoints, teamId) {
   try {
     fetch('http://localhost:3000/companypoint', {
           method: 'POST',
@@ -46,7 +58,14 @@ function _givePoints(teampoints, teamId){
       })
     } catch (error) {
       console.log(error);
-    }
+      Alert.alert(
+        'Pisteiden antaminen epäonnistui',
+        'Yritä myöhemmin uudelleen'
+        [
+          {text: 'OK', onPress: () => console.log('checkcheck')}
+        ]
+      )
+  }
 }
 
 class TeamView extends Component {
@@ -54,6 +73,7 @@ class TeamView extends Component {
   constructor() {
     super();
     this.state = {
+      searchString: '',
       teamDataSource: ds.cloneWithRows(teams),
     };
     try {
@@ -92,6 +112,14 @@ class TeamView extends Component {
             Teams
           </Text>
         </View>
+        <View style={styles.search}>
+          <TextInput
+            style={styles.searchBar}
+            onChangeText={searchString => this.setState({searchString})}
+            value={this.state.searchString}
+            placeholder='Search...'
+            />
+        </View>
       <ListView
         enableEmptySections={true}
         dataSource={this.state.teamDataSource}
@@ -114,12 +142,15 @@ class TeamView extends Component {
               <View>
 
               <RadioForm
+                style={styles.radioButton}
                 radio_props={radio_props}
                 initial={team.point-1}
                 labelHorizontal={false}
+                labelStyle={{fontSize: 16, color: '#FFF'}}
+                buttonColor={'#FFF'}
                 formHorizontal={true}
 
-                onPress={(value) => { _givePoints( value, team.teamId)}}
+                onPress={(value) => { _givePoints( value, team.teamId, team.name)}}
                 />
               </View>
             </View>
@@ -138,22 +169,39 @@ const styles = StyleSheet.create({
   headerStyle: {
     height: 50,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    margin: 10
   },
   titleStyle: {
     fontSize: 30,
     fontWeight: "bold",
+    color: '#FFF',
     marginTop: 10,
     marginLeft: 20
+  },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10
+  },
+  searchBar: {
+    width: 300,
+    height: 50,
+    color: '#000',
+    padding: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 5
   },
   teamRow: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    height: 100,
+    height: 110,
     borderColor: "gray",
-    borderWidth: 1
+    borderWidth: 1,
+    backgroundColor: '#ff5454'
   },
   teamContent: {
     flex: 1,
@@ -174,12 +222,13 @@ const styles = StyleSheet.create({
   },
   thumb: {
     marginLeft: 20,
-    height: 50,
-    width: 50
+    height: 70,
+    width: 70
   },
   teamName: {
     marginLeft: 20,
-    fontSize: 20
+    fontSize: 20,
+    color: '#FFF'
   },
   pointInput: {
     height: 30,
@@ -193,7 +242,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     margin: 5
-  }
+  },
 });
 
 export default TeamView;

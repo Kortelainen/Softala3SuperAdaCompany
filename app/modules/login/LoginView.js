@@ -38,7 +38,7 @@ class LoginView extends Component {
 
   async companyLogin () {
     try {
-      let response = await fetch('https://localhost/company/authenticate', {
+      let response = await fetch('https://localhost:3000/company/authenticate', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -91,7 +91,7 @@ class LoginView extends Component {
               </View>
         </View>
         <View style={styles.loginButton}>
-          <TouchableHighlight onPress={this.companyLogin.bind(this)}>
+          <TouchableHighlight onPress={this.redirect.bind(this)}>
             <View style={styles.login}>
               <Text style={styles.whiteFont}>KIRJAUDU SISÄÄN</Text>
             </View>
@@ -105,19 +105,20 @@ class LoginView extends Component {
 const styles = StyleSheet.create({
   loginContainer: {
     flex: 1,
-    backgroundColor: "rgba(250,155,145,1)",
+    backgroundColor: "rgb(255,0,54)",
     alignItems: "center",
   },
   header: {
     flexDirection: "row",
     justifyContent: "center",
+    margin: 30
   },
   welcomeText: {
     marginLeft:30,
     marginTop: 30
   },
   textField: {
-    borderColor: 'gray',
+    borderColor: '#FFF',
     borderWidth: 1
   },
   loginContent: {
@@ -133,11 +134,10 @@ const styles = StyleSheet.create({
     width: 300,
     height: 45,
     fontSize: 20,
-
-
+    padding: 10
   },
   loginButton: {
-    backgroundColor: '#ff5454',
+    backgroundColor: '#FF8A8C',
     alignItems: "center",
     justifyContent: "center",
     height: 70,
@@ -150,13 +150,11 @@ const styles = StyleSheet.create({
   logoImg: {
     height: 150,
     width: 150,
-
   },
   textstyle: {
     color: '#FFF',
     fontSize: 20,
-
-
+    fontWeight: 'bold'
   },
   whiteFont: {
     fontSize: 18,
