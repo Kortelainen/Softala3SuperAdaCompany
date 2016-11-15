@@ -30,13 +30,13 @@ var radio_props = [
 ];
 
 function _givePoints(teampoints, teamId, name){
-  Alert.alert(
-    'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
-    'Vahvista pisteet painamalla OK'
-    [
-      {text: 'OK', onPress: savePoints(teampoints,teamId)}
-    ]
-  )
+    Alert.alert(
+      'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
+      'Vahvista pisteet painamalla OK'
+      [
+        {text: 'OK', onPress: savePoints(teampoints,teamId)}
+      ]
+    )
 }
 
 function savePoints(teampoints, teamId) {
@@ -60,6 +60,42 @@ function savePoints(teampoints, teamId) {
       console.log(error);
       Alert.alert(
         'Pisteiden antaminen epäonnistui',
+        'Yritä myöhemmin uudelleen'
+        [
+          {text: 'OK', onPress: () => console.log('checkcheck')}
+        ]
+      )
+  }
+}
+
+function clearPoints(value,teamId,name) {
+  Alert.alert(
+    'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
+    'Vahvista pisteiden poisto painamalla OK',
+    [
+      {text: 'Peruuta' , onPress: () => console.log('Peuutettu')},
+      {text: 'OK', onPress: () => clearPointsDB(value,teamId)}
+    ]
+  )
+}
+
+function clearPointsDB(value,teamId) {
+  try {
+    fetch('http://localhost:3000/clearPoints', {
+          method: 'POST',
+          body: JSON.stringify({
+            teamId: teamId
+          })
+        })
+      .then((response) => response.json())
+      .then(response => {
+        var report = response.success
+        console.log(report)
+      })
+    } catch (error) {
+      console.log(error);
+      Alert.alert(
+        'Pisteiden poistaminen ei onnistunut',
         'Yritä myöhemmin uudelleen'
         [
           {text: 'OK', onPress: () => console.log('checkcheck')}
@@ -139,7 +175,6 @@ class TeamView extends Component {
               <Text style={styles.teamName}>{team.name}</Text>
             </View>
             <View style={styles.allButtons}>
-              <View>
 
               <RadioForm
                 style={styles.radioButton}
@@ -149,10 +184,18 @@ class TeamView extends Component {
                 labelStyle={{fontSize: 16, color: '#FFF'}}
                 buttonColor={'#FFF'}
                 formHorizontal={true}
-
                 onPress={(value) => { _givePoints( value, team.teamId, team.name)}}
                 />
-              </View>
+
+                <TouchableHighlight
+                onPress={(value) => { clearPoints( value, team.teamId, team.name)}}
+                style={{marginLeft: 10}}>
+                  <Image
+                    style={styles.numButton}
+                    source={require('../../../docs/images/buttonImages/x_white.png')}
+                  />
+                </TouchableHighlight>
+
             </View>
           </View>
         </View>
@@ -212,7 +255,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "flex-start"
   },
   teamText: {
     flex: 1,
@@ -239,8 +282,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   numButton: {
-    height: 30,
-    width: 30,
+    height: 28,
+    width: 28,
     margin: 5
   },
 });
