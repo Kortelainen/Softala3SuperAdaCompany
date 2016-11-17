@@ -28,83 +28,62 @@ var radio_props = [
   {label: '4', value: 4 },
   {label: '5', value: 5 }
 ];
+class TeamView extends Component {
 
-function _givePoints(teampoints, teamId, name){
+  _givePoints(teampoints, teamId, name){
+      Alert.alert(
+        'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
+        'Vahvista pisteet painamalla OK'
+        [
+          {text: 'OK', onPress: this.savePoints(teampoints,teamId)}
+        ]
+      )
+  }
+
+  async savePoints(teampoints, teamId) {
+      const response = await post('/companypoint', {
+              teamId: teamId,
+              point: teampoints
+          }, this.props.token)
+          var report = response.success
+  }
+
+  clearPoints(value,teamId,name) {
     Alert.alert(
-      'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
-      'Vahvista pisteet painamalla OK'
+      'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
+      'Vahvista pisteiden poisto painamalla OK',
       [
-        {text: 'OK', onPress: savePoints(teampoints,teamId)}
+        {text: 'Peruuta' , onPress: () => console.log('Peuutettu')},
+        {text: 'OK', onPress: () => this.clearPointsDB(value,teamId)}
       ]
     )
-}
-
-function savePoints(teampoints, teamId) {
-  try {
-    fetch('http://localhost:3000/companypoint', {
-          method: 'POST',
-          body: JSON.stringify({
-            teamId: teamId,
-            companyId: 1,
-            point: teampoints
-          })
-        })
-      .then((response) => response.json())
-      .then(response => {
-        var report = response.success
-        console.log(report)
-
-        //console.log(teams);
-      })
-    } catch (error) {
-      console.log(error);
-      Alert.alert(
-        'Pisteiden antaminen epäonnistui',
-        'Yritä myöhemmin uudelleen'
-        [
-          {text: 'OK', onPress: () => console.log('checkcheck')}
-        ]
-      )
   }
-}
 
-function clearPoints(value,teamId,name) {
-  Alert.alert(
-    'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
-    'Vahvista pisteiden poisto painamalla OK',
-    [
-      {text: 'Peruuta' , onPress: () => console.log('Peuutettu')},
-      {text: 'OK', onPress: () => clearPointsDB(value,teamId)}
-    ]
-  )
-}
-
-function clearPointsDB(value,teamId) {
-  try {
-    fetch('http://localhost:3000/clearPoints', {
-          method: 'POST',
-          body: JSON.stringify({
-            teamId: teamId
+  clearPointsDB(value,teamId) {
+    try {
+      fetch('http://localhost:3000/clearPoints', {
+            method: 'POST',
+            body: JSON.stringify({
+              teamId: teamId
+            })
           })
+        .then((response) => response.json())
+        .then(response => {
+          var report = response.success
+          console.log(report)
         })
-      .then((response) => response.json())
-      .then(response => {
-        var report = response.success
-        console.log(report)
-      })
-    } catch (error) {
-      console.log(error);
-      Alert.alert(
-        'Pisteiden poistaminen ei onnistunut',
-        'Yritä myöhemmin uudelleen'
-        [
-          {text: 'OK', onPress: () => console.log('checkcheck')}
-        ]
-      )
+      } catch (error) {
+        console.log(error);
+        Alert.alert(
+          'Pisteiden poistaminen ei onnistunut',
+          'Yritä myöhemmin uudelleen'
+          [
+            {text: 'OK', onPress: () => console.log('checkcheck')}
+          ]
+        )
+    }
   }
-}
 
-class TeamView extends Component {
 
   constructor() {
     super();
@@ -170,11 +149,11 @@ class TeamView extends Component {
                 labelStyle={{fontSize: 16, color: '#FFF'}}
                 buttonColor={'#FFF'}
                 formHorizontal={true}
-                onPress={(value) => { _givePoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
                 />
 
                 <TouchableHighlight
-                onPress={(value) => { clearPoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this.clearPoints( value, team.teamId, team.name)}}
                 style={{marginLeft: 10}}>
                   <Image
                     style={styles.numButton}
