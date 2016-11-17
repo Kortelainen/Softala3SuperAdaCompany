@@ -6,8 +6,11 @@ import {
   StyleSheet,
   TouchableHighlight,
   Image,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from 'react-native';
+
+import {post} from '../../utils/api'
 
 const ACCESS_TOKEN = 'access_token';
 
@@ -37,6 +40,27 @@ class LoginView extends Component {
   }
 
   async companyLogin () {
+    const response = await post('/company/authenticate', {
+    name: this.state.companyname
+  }, this.props.token);
+      console.log(response);
+    if (response.success === true) {
+      this.props.updateToken(response.token.token);
+      this.redirect();
+    } else {
+      Alert.alert(
+        'Tiimiä ei löytynyt',
+        'Tarkista tiimin nimi',
+        [
+          {text: 'OK'}
+        ]
+      );
+    }
+
+
+
+
+    /*
     try {
       let response = await fetch('https://localhost:3000/company/authenticate', {
         method: 'POST',
@@ -61,7 +85,7 @@ class LoginView extends Component {
     } catch(error) {
       this.setState({error: error});
       console.log("error " + error);
-    }
+    }*/
   }
   redirect () {
     this.props.navigator.push({
@@ -91,7 +115,7 @@ class LoginView extends Component {
               </View>
         </View>
         <View style={styles.loginButton}>
-          <TouchableHighlight onPress={this.redirect.bind(this)}>
+          <TouchableHighlight onPress={this.companyLogin.bind(this)}>
             <View style={styles.login}>
               <Text style={styles.whiteFont}>KIRJAUDU SISÄÄN</Text>
             </View>

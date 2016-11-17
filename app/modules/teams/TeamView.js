@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import THUMBS from '../../../docs/images/defImg.jpeg';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
-
+import {post, get} from '../../utils/api'
 const teams = []
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 var teampoints = 0
@@ -112,32 +112,18 @@ class TeamView extends Component {
       searchString: '',
       teamDataSource: ds.cloneWithRows(teams),
     };
-    try {
-      fetch('http://localhost:3000/teamList', {
-            method: 'POST',
-            body: JSON.stringify({
-              searchfilter: "",
-            })
-          })
-        .then((response) => response.json())
-        .then(response => {
-          var allTeamsList = response.result
-          for (var i = 0; i < allTeamsList.length; i++) {
-            teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
-            this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+  }
 
-          }
-          //console.log(teams);
-        })
-      } catch (error) {
-        Alert.alert(
-            'Yhteys kantaan ei ole päällä',
-            ':C',
-            [
-              {text: 'OK', onPress: () => console.log('OK Pressed')},
-            ]
-          )
-      }
+  async componentDidMount() {
+    const response = await post('/teamList', {
+        searchfilter: "",
+      }, this.props.token)
+
+    var allTeamsList = response.result
+    for (var i = 0; i < allTeamsList.length; i++) {
+      teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
+      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+    }
   }
 
   render () {
