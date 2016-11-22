@@ -35,7 +35,8 @@ class TeamView extends Component {
         'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
         'Vahvista pisteet painamalla OK'
         [
-          {text: 'OK', onPress: this.savePoints(teampoints,teamId)}
+          {text: 'OK', onPress: this.savePoints(teampoints,teamId)},
+          {text: 'Peruuta', onPress: () => console.log('Peruutettu')}
         ]
       )
   }
@@ -48,13 +49,13 @@ class TeamView extends Component {
           var report = response.success
   }
 
-  clearPoints(value,teamId,name) {
+  clearPoints(value, teamId, name) {
     Alert.alert(
       'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
       'Vahvista pisteiden poisto painamalla OK',
       [
-        {text: 'Peruuta' , onPress: () => console.log('Peuutettu')},
-        {text: 'OK', onPress: () => this.clearPointsDB(value,teamId)}
+        {text: 'OK', onPress: () => this.clearPointsDB(value,teamId)},
+        {text: 'Peruuta' , onPress: () => console.log('Peuutettu')}
       ]
     )
   }

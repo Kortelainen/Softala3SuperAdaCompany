@@ -49,8 +49,8 @@ class LoginView extends Component {
       this.redirect();
     } else {
       Alert.alert(
-        'Tiimiä ei löytynyt',
-        'Tarkista tiimin nimi',
+        'Yritystä ei löytynyt',
+        'Tarkista yrityksen nimi',
         [
           {text: 'OK'}
         ]
