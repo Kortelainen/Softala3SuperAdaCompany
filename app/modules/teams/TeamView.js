@@ -54,35 +54,19 @@ class TeamView extends Component {
       'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
       'Vahvista pisteiden poisto painamalla OK',
       [
-        {text: 'OK', onPress: () => this.clearPointsDB(value,teamId)},
-        {text: 'Peruuta' , onPress: () => console.log('Peuutettu')}
+
+        {text: 'OK', onPress: () => this.clearPointsDB(teamId)},
+        {text: 'Peruuta'}
       ]
     )
   }
 
-  clearPointsDB(value,teamId) {
-    try {
-      fetch('http://localhost:3000/clearPoints', {
-            method: 'POST',
-            body: JSON.stringify({
+  async clearPointsDB(teamId) {
+      const response = await post('/clearPoints', {
               teamId: teamId
-            })
-          })
-        .then((response) => response.json())
-        .then(response => {
+          }, this.props.token)
           var report = response.success
           console.log(report)
-        })
-      } catch (error) {
-        console.log(error);
-        Alert.alert(
-          'Pisteiden poistaminen ei onnistunut',
-          'Yritä myöhemmin uudelleen'
-          [
-            {text: 'OK', onPress: () => console.log('checkcheck')}
-          ]
-        )
-    }
   }
 
 
