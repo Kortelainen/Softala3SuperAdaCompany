@@ -30,7 +30,7 @@ var radio_props = [
 ];
 class TeamView extends Component {
 
-  _givePoints(teampoints, teamId, name){
+  _givePoints(teampoints, teamId, name) {
       Alert.alert(
         'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
         'Vahvista pisteet painamalla OK'
@@ -67,6 +67,30 @@ class TeamView extends Component {
           }, this.props.token)
           var report = response.success
           console.log(report)
+          this.getNewDataSource()
+  }
+
+  async getNewDataSource() {
+    teams = []
+    const response = await post('/teamList', {
+        searchfilter: "",
+      }, this.props.token)
+
+    var allTeamsList = response.result
+    for (var i = 0; i < allTeamsList.length; i++) {
+      teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
+      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+    }
+  }
+
+  async filterTeams(searchString) {
+    var filteredTeamsList = []
+    for (var i = 0; i < teams.length; i++) {
+      if (teams[i].name.toLowerCase().includes(searchString.toLowerCase())) {
+         filteredTeamsList.push({"img": teams[i].img,"name": teams[i].name, "teamId": teams[i].teamId, "point": teams[i].point});
+      }
+    }
+    this.setState({ teamDataSource: ds.cloneWithRows(filteredTeamsList) });
   }
 
 
@@ -101,13 +125,17 @@ class TeamView extends Component {
         <View style={styles.search}>
           <TextInput
             style={styles.searchBar}
-            onChangeText={searchString => this.setState({searchString})}
+            onChangeText={(searchString) => {
+              this.setState({searchString});
+              this.filterTeams(searchString);
+              }}
             value={this.state.searchString}
             placeholder='Search...'
             />
         </View>
       <ListView
         enableEmptySections={true}
+        keyboardShouldPersistTaps={true}
         dataSource={this.state.teamDataSource}
         renderRow={(team) => { return this.renderTeamRow(team)}}
       />
@@ -125,8 +153,9 @@ class TeamView extends Component {
               <Text style={styles.teamName}>{team.name}</Text>
             </View>
             <View style={styles.allButtons}>
-
+              <View>
               <RadioForm
+                name={team.teamId}
                 style={styles.radioButton}
                 radio_props={radio_props}
                 initial={team.point-1}
@@ -136,7 +165,7 @@ class TeamView extends Component {
                 formHorizontal={true}
                 onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
                 />
-
+                </View>
                 <TouchableHighlight
                 onPress={(value) => { this.clearPoints( value, team.teamId, team.name)}}
                 style={{marginLeft: 10}}>
