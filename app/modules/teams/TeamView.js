@@ -49,28 +49,29 @@ class TeamView extends Component {
           var report = response.success
   }
 
-  clearPoints(value, teamId, name) {
+  clearPoints(value, teamId, name, teamPoint) {
     Alert.alert(
       'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
       'Vahvista pisteiden poisto painamalla OK',
       [
-        {text: 'OK', onPress: () => this.clearPointsDB(teamId)},
+        {text: 'OK', onPress: () => this.clearPointsDB(teamId, teamPoint)},
         {text: 'Peruuta'}
       ]
     )
   }
 
-  async clearPointsDB(teamId) {
+  async clearPointsDB(teamId, teamPoint) {
       const response = await post('/clearPoints', {
               teamId: teamId
           }, this.props.token)
           var report = response.success
           console.log(report)
+          teams = []
+          this.setState({ teamDataSource: ds.cloneWithRows(teams) });
           this.getNewDataSource()
   }
 
   async getNewDataSource() {
-    teams = []
     const response = await post('/teamList', {
         searchfilter: "",
       }, this.props.token)
@@ -78,8 +79,10 @@ class TeamView extends Component {
     var allTeamsList = response.result
     for (var i = 0; i < allTeamsList.length; i++) {
       teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
-      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+
     }
+    this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+
   }
 
   async filterTeams(searchString) {
@@ -165,14 +168,14 @@ class TeamView extends Component {
                 onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
                 />
                 </View>
-                <TouchableHighlight>
+                {/* <TouchableHighlight>
                   <Image
                     style={styles.star}
                     source={require('../../../docs/images/star2.png')}
                   />
-                </TouchableHighlight>
+                </TouchableHighlight>*/}
                 <TouchableHighlight
-                onPress={(value) => { this.clearPoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this.clearPoints( value, team.teamId, team.name, team.point)}}
                 style={{marginLeft: 10}}>
                   <Image
                     style={styles.numButton}
