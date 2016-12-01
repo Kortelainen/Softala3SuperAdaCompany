@@ -54,7 +54,6 @@ class TeamView extends Component {
       'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
       'Vahvista pisteiden poisto painamalla OK',
       [
-
         {text: 'OK', onPress: () => this.clearPointsDB(teamId)},
         {text: 'Peruuta'}
       ]
@@ -166,6 +165,12 @@ class TeamView extends Component {
                 onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
                 />
                 </View>
+                <TouchableHighlight>
+                  <Image
+                    style={styles.star}
+                    source={require('../../../docs/images/star2.png')}
+                  />
+                </TouchableHighlight>
                 <TouchableHighlight
                 onPress={(value) => { this.clearPoints( value, team.teamId, team.name)}}
                 style={{marginLeft: 10}}>
@@ -186,18 +191,20 @@ const styles = StyleSheet.create({
   teamContainer: {
     flex: 1,
     marginTop: 20,
-    backgroundColor: "rgba(250,155,145,1)"
+    backgroundColor: "#FAFAFA"
   },
   headerStyle: {
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    margin: 10
+    margin: 10,
+    backgroundColor: '#FAFAFA'
+
   },
   titleStyle: {
     fontSize: 30,
     fontWeight: "bold",
-    color: '#FFF',
+    color: '#FF0036',
     marginTop: 10,
     marginLeft: 20
   },
@@ -212,23 +219,23 @@ const styles = StyleSheet.create({
     height: 50,
     color: '#000',
     padding: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: '#EEEEEE',
     borderRadius: 5
   },
   teamRow: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     height: 110,
-    borderColor: "gray",
-    borderWidth: 1,
-    backgroundColor: '#ff5454'
+    backgroundColor: '#FF0036',
+    marginBottom: 10,
+    borderRadius: 15,
   },
   teamContent: {
     flex: 1,
     flexDirection: "column",
-    justifyContent: "flex-start"
+    justifyContent: "center",
+
   },
   allButtons: {
     flex: 1,
@@ -261,10 +268,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   numButton: {
-    height: 28,
-    width: 28,
-    margin: 5
+    height: 25,
+    width: 25,
+    marginLeft:15,
+    marginTop: 5
   },
+  star: {
+    height:29,
+    width:29,
+    marginLeft: 10,
+
+  }
 });
 
 export default TeamView;
