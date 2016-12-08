@@ -30,13 +30,13 @@ var radio_props = [
 ];
 class TeamView extends Component {
 
-  _givePoints(teampoints, teamId, name) {
+  givePoints(teampoints, teamId, name) {
       Alert.alert(
         'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
-        'Vahvista pisteet painamalla OK'
+        'Vahvista pisteet painamalla OK',
         [
-          {text: 'OK', onPress: this.savePoints(teampoints,teamId)},
-          {text: 'Peruuta', onPress: () => console.log('Peruutettu')}
+          {text: 'OK', onPress: () => this.savePoints(teampoints,teamId)},
+          {text: 'Peruuta', onPress: () => this.cancel()}
         ]
       )
   }
@@ -47,6 +47,12 @@ class TeamView extends Component {
               point: teampoints
           }, this.props.token)
           var report = response.success
+  }
+
+  cancel() {
+    teams = []
+    this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+    this.getNewDataSource()
   }
 
   clearPoints(value, teamId, name, teamPoint) {
@@ -64,8 +70,6 @@ class TeamView extends Component {
       const response = await post('/clearPoints', {
               teamId: teamId
           }, this.props.token)
-          var report = response.success
-          console.log(report)
           teams = []
           this.setState({ teamDataSource: ds.cloneWithRows(teams) });
           this.getNewDataSource()
@@ -165,7 +169,7 @@ class TeamView extends Component {
                 labelStyle={{fontSize: 16, color: '#FFF'}}
                 buttonColor={'#FFF'}
                 formHorizontal={true}
-                onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this.givePoints( value, team.teamId, team.name)}}
                 />
                 </View>
                 {/* <TouchableHighlight>
