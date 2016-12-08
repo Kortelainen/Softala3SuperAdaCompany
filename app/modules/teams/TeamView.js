@@ -14,8 +14,11 @@ import {
 import THUMBS from '../../../docs/images/defImg.jpeg';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import {post, get} from '../../utils/api'
-const teams = []
-const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+const ds = new ListView.DataSource({
+  rowHasChanged: (r1, r2) => {
+    return r1.teamId !== r2.teamId;
+  }
+});
 var teampoints = 0
 var teamId = 0
 var button = 0
@@ -36,7 +39,7 @@ class TeamView extends Component {
         'Vahvista pisteet painamalla OK',
         [
           {text: 'OK', onPress: () => this.savePoints(teampoints,teamId)},
-          {text: 'Peruuta', onPress: () => this.cancel()}
+          {text: 'Peruuta', onPress: () => console.log('Peruutettu')}
         ]
       )
   }
@@ -46,14 +49,8 @@ class TeamView extends Component {
               teamId: teamId,
               point: teampoints
           }, this.props.token)
-          teams = []
+          var teams = [];
           this.getNewDataSource()
-  }
-
-  cancel() {
-    teams = []
-    this.setState({ teamDataSource: ds.cloneWithRows(teams) });
-    this.getNewDataSource()
   }
 
   clearPoints(value, teamId, name, teamPoint) {
@@ -71,7 +68,7 @@ class TeamView extends Component {
       const response = await post('/clearPoints', {
               teamId: teamId
           }, this.props.token)
-          teams = []
+          var teams = [];
           this.setState({ teamDataSource: ds.cloneWithRows(teams) });
           this.getNewDataSource()
   }
@@ -81,42 +78,39 @@ class TeamView extends Component {
         searchfilter: "",
       }, this.props.token)
     var allTeamsList = response.result
+    var teams = [];
     for (var i = 0; i < allTeamsList.length; i++) {
 	       teams.push({"img": allTeamsList[i].file,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
 	      }
+    this.setState({ teams: teams });
     this.setState({ teamDataSource: ds.cloneWithRows(teams) });
 
   }
 
-  async filterTeams(searchString) {
+  filterTeams(searchString) {
+    var teams = this.state.teams;
     var filteredTeamsList = []
     for (var i = 0; i < teams.length; i++) {
       if (teams[i].name.toLowerCase().includes(searchString.toLowerCase())) {
          filteredTeamsList.push({"img": teams[i].img,"name": teams[i].name, "teamId": teams[i].teamId, "point": teams[i].point});
       }
     }
-    this.setState({ teamDataSource: ds.cloneWithRows(filteredTeamsList) });
+    this.setState({
+      teamDataSource: this.state.teamDataSource.cloneWithRows(filteredTeamsList)
+    });
   }
-
 
   constructor() {
     super();
     this.state = {
       searchString: '',
-      teamDataSource: ds.cloneWithRows(teams),
+      teamDataSource: ds.cloneWithRows([]),
+      teams: [],
     };
   }
 
   async componentDidMount() {
-    const response = await post('/teamList', {
-        searchfilter: "",
-      }, this.props.token)
-
-    var allTeamsList = response.result
-    for (var i = 0; i < allTeamsList.length; i++) {
-      teams.push({"img": allTeamsList[i].file, "name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
-    }
-      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+    await this.getNewDataSource();
   }
 
   render () {
@@ -164,23 +158,32 @@ class TeamView extends Component {
             <View style={styles.allButtons}>
               <View>
               <RadioForm
-                name={team.teamId}
-                style={styles.radioButton}
-                radio_props={radio_props}
-                initial={team.point-1}
-                labelHorizontal={false}
-                labelStyle={{fontSize: 16, color: '#FFF'}}
-                buttonColor={'#FFF'}
                 formHorizontal={true}
-                onPress={(value) => { this.givePoints( value, team.teamId, team.name)}}
-                />
-                </View>
-                {/* <TouchableHighlight>
-                  <Image
-                    style={styles.star}
-                    source={require('../../../docs/images/star2.png')}
+                >
+                {radio_props.map((obj, i) => (
+                <RadioButton labelHorizontal={false} key={i} >
+                  <RadioButtonInput
+                    obj={obj}
+                    index={i}
+                    isSelected={team.point - 1 === i}
+                    onPress={(value) => { this.givePoints( value, team.teamId, team.name)}}
+                    borderWidth={1}
+                    buttonInnerColor={'#FFF'}
+                    buttonOuterColor={'#FFF'}
+                    buttonStyle={styles.radioButton}
                   />
-                </TouchableHighlight>*/}
+                  <RadioButtonLabel
+                    obj={obj}
+                    index={i}
+                    labelHorizontal={false}
+                    onPress={(value) => { this.givePoints( value, team.teamId, team.name)}}
+                    labelStyle={{fontSize: 16, color: '#FFF'}}
+                    labelWrapStyle={{}}
+                  />
+                </RadioButton>
+              ))}
+                </RadioForm>
+                </View>
                 <TouchableHighlight
                 onPress={(value) => { this.clearPoints( value, team.teamId, team.name, team.point)}}
                 style={{marginLeft: 10}}>
@@ -189,7 +192,6 @@ class TeamView extends Component {
                     source={require('../../../docs/images/buttonImages/x_white.png')}
                   />
                 </TouchableHighlight>
-
             </View>
           </View>
         </View>
