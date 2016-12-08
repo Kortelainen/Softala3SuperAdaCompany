@@ -46,7 +46,8 @@ class TeamView extends Component {
               teamId: teamId,
               point: teampoints
           }, this.props.token)
-          var report = response.success
+          teams = []
+          this.getNewDataSource()
   }
 
   cancel() {
