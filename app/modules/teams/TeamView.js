@@ -30,13 +30,13 @@ var radio_props = [
 ];
 class TeamView extends Component {
 
-  _givePoints(teampoints, teamId, name) {
+  givePoints(teampoints, teamId, name) {
       Alert.alert(
         'Olet antamassa ' + teampoints + ' pistettä tiimille ' + name,
-        'Vahvista pisteet painamalla OK'
+        'Vahvista pisteet painamalla OK',
         [
-          {text: 'OK', onPress: this.savePoints(teampoints,teamId)},
-          {text: 'Peruuta', onPress: () => console.log('Peruutettu')}
+          {text: 'OK', onPress: () => this.savePoints(teampoints,teamId)},
+          {text: 'Peruuta', onPress: () => this.cancel()}
         ]
       )
   }
@@ -49,37 +49,42 @@ class TeamView extends Component {
           var report = response.success
   }
 
-  clearPoints(value, teamId, name) {
+  cancel() {
+    teams = []
+    this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+    this.getNewDataSource()
+  }
+
+  clearPoints(value, teamId, name, teamPoint) {
     Alert.alert(
       'Olet poistamassa antamasi pisteet tiimiltä: ' + name,
       'Vahvista pisteiden poisto painamalla OK',
       [
-
-        {text: 'OK', onPress: () => this.clearPointsDB(teamId)},
+        {text: 'OK', onPress: () => this.clearPointsDB(teamId, teamPoint)},
         {text: 'Peruuta'}
       ]
     )
   }
 
-  async clearPointsDB(teamId) {
+  async clearPointsDB(teamId, teamPoint) {
       const response = await post('/clearPoints', {
               teamId: teamId
           }, this.props.token)
-          var report = response.success
-          console.log(report)
+          teams = []
+          this.setState({ teamDataSource: ds.cloneWithRows(teams) });
           this.getNewDataSource()
   }
 
   async getNewDataSource() {
-    teams = []
     const response = await post('/teamList', {
         searchfilter: "",
       }, this.props.token)
     var allTeamsList = response.result
     for (var i = 0; i < allTeamsList.length; i++) {
-      teams.push({"img": allTeamsList[i].file,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
-      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
-    }
+	       teams.push({"img": allTeamsList[i].file,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
+	      }
+    this.setState({ teamDataSource: ds.cloneWithRows(teams) });
+
   }
 
   async filterTeams(searchString) {
@@ -109,8 +114,8 @@ class TeamView extends Component {
     var allTeamsList = response.result
     for (var i = 0; i < allTeamsList.length; i++) {
       teams.push({"img": allTeamsList[i].file, "name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
-      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
     }
+      this.setState({ teamDataSource: ds.cloneWithRows(teams) });
   }
 
   render () {
@@ -166,11 +171,17 @@ class TeamView extends Component {
                 labelStyle={{fontSize: 16, color: '#FFF'}}
                 buttonColor={'#FFF'}
                 formHorizontal={true}
-                onPress={(value) => { this._givePoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this.givePoints( value, team.teamId, team.name)}}
                 />
                 </View>
+                {/* <TouchableHighlight>
+                  <Image
+                    style={styles.star}
+                    source={require('../../../docs/images/star2.png')}
+                  />
+                </TouchableHighlight>*/}
                 <TouchableHighlight
-                onPress={(value) => { this.clearPoints( value, team.teamId, team.name)}}
+                onPress={(value) => { this.clearPoints( value, team.teamId, team.name, team.point)}}
                 style={{marginLeft: 10}}>
                   <Image
                     style={styles.numButton}
@@ -189,18 +200,20 @@ const styles = StyleSheet.create({
   teamContainer: {
     flex: 1,
     marginTop: 20,
-    backgroundColor: "rgba(250,155,145,1)"
+    backgroundColor: "#FAFAFA"
   },
   headerStyle: {
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    margin: 10
+    margin: 10,
+    backgroundColor: '#FAFAFA'
+
   },
   titleStyle: {
     fontSize: 30,
     fontWeight: "bold",
-    color: '#FFF',
+    color: '#FF0036',
     marginTop: 10,
     marginLeft: 20
   },
@@ -215,23 +228,23 @@ const styles = StyleSheet.create({
     height: 50,
     color: '#000',
     padding: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: '#EEEEEE',
     borderRadius: 5
   },
   teamRow: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     height: 110,
-    borderColor: "gray",
-    borderWidth: 1,
-    backgroundColor: '#ff5454'
+    backgroundColor: '#FF0036',
+    marginBottom: 10,
+    borderRadius: 15,
   },
   teamContent: {
     flex: 1,
     flexDirection: "column",
-    justifyContent: "flex-start"
+    justifyContent: "center",
+
   },
   allButtons: {
     flex: 1,
@@ -266,10 +279,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   numButton: {
-    height: 28,
-    width: 28,
-    margin: 5
+    height: 25,
+    width: 25,
+    marginLeft:15,
+    marginTop: 5
   },
+  star: {
+    height:29,
+    width:29,
+    marginLeft: 10,
+
+  }
 });
 
 export default TeamView;
