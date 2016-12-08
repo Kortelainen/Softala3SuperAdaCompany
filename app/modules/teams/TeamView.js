@@ -75,10 +75,9 @@ class TeamView extends Component {
     const response = await post('/teamList', {
         searchfilter: "",
       }, this.props.token)
-
     var allTeamsList = response.result
     for (var i = 0; i < allTeamsList.length; i++) {
-      teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
+      teams.push({"img": allTeamsList[i].file,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
       this.setState({ teamDataSource: ds.cloneWithRows(teams) });
     }
   }
@@ -109,7 +108,7 @@ class TeamView extends Component {
 
     var allTeamsList = response.result
     for (var i = 0; i < allTeamsList.length; i++) {
-      teams.push({"img": allTeamsList[i].docId,"name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
+      teams.push({"img": allTeamsList[i].file, "name": allTeamsList[i].teamName, "teamId": allTeamsList[i].teamId, "point": allTeamsList[i].point});
       this.setState({ teamDataSource: ds.cloneWithRows(teams) });
     }
   }
@@ -144,7 +143,11 @@ class TeamView extends Component {
   }
 
   renderTeamRow (team) {
-    const imgSource = THUMBS;
+    var imgSource = THUMBS;
+    if(team.img != null){
+      imgSource = {uri: 'data:image/png;base64,' + team.img, isStatic: true}
+    }
+
     return (
         <View style={styles.teamRow}>
           <Image style={styles.thumb} source={imgSource} />
@@ -245,7 +248,9 @@ const styles = StyleSheet.create({
   thumb: {
     marginLeft: 20,
     height: 70,
-    width: 70
+    width: 70,
+    borderWidth: 0,
+    borderRadius: 35
   },
   teamName: {
     marginLeft: 20,
